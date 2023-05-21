@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+</head><body>
+<h1>AI-BGM</h1>
+
+<table>
+  <tr><th>tempo</th><td><input id=intempo value="100"></td></tr>
+  <tr><th>beat</th><td><select id=selbeat>
+    <option selected>2</option>
+    <option>4</option>
+    <option>8</option>
+    <option>16</option>
+    <option>32</option>
+  </select></td></tr>
+<tr><th>length</th><td><input id=inlength value="4"></td></tr>
+<tr><th></th><td><button id=btn>play</button></td></tr>
+</table>
+
+<hr>
+Lib: <a href=https://www.tensorflow.org/js?hl=ja>TensorFlow.js</a> / <a href=https://github.com/magenta/magenta>Magenta core</a> / <a href=https://magenta.tensorflow.org/music-vae>Magenta MusicVAE</a> / <a href=https://github.com/code4fukui/smplr>smplr</a><br>
+<a href=https://github.com/code4fukui/ai-bgm/>src on GitHub</a>
+
+<!--
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/dist/magentamusic.min.js"></script>
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.2.8/tf.min.js"></script>
+<!-- Core library, since we're going to use a player -->
+<script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
+<!--Model we want to use -->
+<script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/music_vae.js"></script>
+
+
+<script type="module">
+import { SplendidGrandPiano } from "https://code4fukui.github.io/smplr/smplr.js";
+
+//import { MusicVAE } from 'https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/+esm';
+// https://www.jsdelivr.com/package/npm/@magenta/music
+//  cdn
+// https://magenta.tensorflow.org/music-vae
+//  org
+
+//const url = 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar'; // with drums
+const url = 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_16bar_small_q2'; 
+const vae = new music_vae.MusicVAE(url);
+console.log(vae)
+await vae.initialize();
+
+let context = null;
+let piano = null;
+
+btn.onclick = async () => {
+  if (!piano) {
+    context = new AudioContext();
+    piano = new SplendidGrandPiano(context, { decayTime: 0.5 });
+    await piano.loaded();
+  } else {
+    piano.stop();
+  }
+
+  const len = parseInt(inlength.value);
+  const melodies = await vae.sample(len);
+  console.log(melodies);
+  let i = 0;
+  const dt = 60 / (parseFloat(intempo.value) * parseInt(selbeat.value));
+  console.log("dt", dt);
+  const now = context.currentTime;
+  for (const melody of melodies) {
+    for (const note of melody.notes) {
+      const time = now + (i + note.quantizedStartStep) * dt;
+      const duration = (note.quantizedEndStep - note.quantizedStartStep) * dt;
+      piano.start({ note: note.pitch, velocity: 80, time, duration });
+    }
+    i += melody.totalQuantizedSteps;
+  }
+};
+
+</script>
+
+<style>
+body {
+  text-align: center;
+  font-family: san-serif;
+}
+table {
+  text-align: left;
+  display: inline-block;
+}
+</style>
