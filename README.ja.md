@@ -1,19 +1,33 @@
-# AI-BGM
+# ai-bgm
 
-AIで生成された背景音楽を再生できるWebアプリです。Magentaの音楽生成モデルを使用しており、テンポ、拍子、長さなどを指定して好みの曲を生成できます。
+MagentaのMusicVAEモデルを使用してBGM（背景音楽）を生成するWebアプリケーションです。
 
-## 機能
-- テンポ、拍子、長さの設定
-- Magentaの音楽生成モデルによる自動作曲
-- ピアノ演奏による再生
+## デモ
 
-## 必要環境
-特に必要ありません。ブラウザで動作します。
+https://code4fukui.github.io/ai-bgm/
+
+## 主な機能
+
+-   [Magenta MusicVAE](https://magenta.tensorflow.org/music-vae)モデルを使用したAIメロディーの生成
+-   生成される音楽のテンポ、拍子、長さのカスタマイズ
+-   [smplr](https://github.com/code4fukui/smplr)ライブラリによるSplendid Grand Pianoの音色での再生
+
+## 動作環境
+
+Web Audio APIに対応したモダンなウェブブラウザ
 
 ## 使い方
-1. テンポ、拍子、長さを設定します。
-2. 「play」ボタンをクリックすると、AIが生成した曲が再生されます。
-3. 再生を停止するには「play」ボタンをもう一度クリックします。
+
+1.  [デモページ](https://code4fukui.github.io/ai-bgm/)を開きます。
+2.  お好みに合わせてテンポ、拍子、長さの設定を調整します。
+3.  「play」ボタンをクリックすると、音楽が生成・再生されます。
+
+## 使用技術
+
+-   [Magenta.js](https://github.com/magenta/magenta) - 音楽とアートを生成するためのJavaScriptライブラリ。
+-   [TensorFlow.js](https://www.tensorflow.org/js) - 基盤となる機械学習フレームワーク。
+-   [smplr](https://github.com/code4fukui/smplr) - 楽器音のためのシンプルなWeb Audio APIサンプラー。
 
 ## ライセンス
-MIT License
+
+このプロジェクトはMITライセンスです。
